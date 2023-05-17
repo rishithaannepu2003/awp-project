@@ -1,29 +1,33 @@
 <?php
- session_start();
-//Database Configuration File
+session_start();
+error_reporting(0);
 include('includes/config.php');
-//error_reporting(0);
-if(isset($_POST['login']))
-  {
- 
-    // Getting username/ email and password
-     $uname=$_POST['username'];
-    $password=md5($_POST['password']);
-    // Fetch data from database on the basis of username/email and password
-$sql =mysqli_query($con,"SELECT AdminUserName,AdminEmailId,AdminPassword,userType FROM tbladmin WHERE (AdminUserName='$uname' && AdminPassword='$password')");
- $num=mysqli_fetch_array($sql);
-if($num>0)
-{
 
-$_SESSION['login']=$_POST['username'];
-$_SESSION['utype']=$num['userType'];
-    echo "<script type='text/javascript'> document.location = 'dashboard.php'; </script>";
-  }else{
-echo "<script>alert('Invalid Details');</script>";
+if(isset($_POST['submit']))
+  {
+    $username=$_POST['username'];
+    $email=$_POST['email'];
+$password=md5($_POST['newpassword']);
+        $query=mysqli_query($con,"select id from tbladmin where  AdminEmailId='$email' and AdminUserName='$username' ");
+        
+    $ret=mysqli_num_rows($query);
+    if($ret>0){
+      $query1=mysqli_query($con,"update tbladmin set AdminPassword='$password'  where  AdminEmailId='$email' && AdminUserName='$username' ");
+       if($query1)
+   {
+echo "<script>alert('Password successfully changed');</script>";
+echo "<script type='text/javascript'> document.location = 'index.php'; </script>";
+
+   }
+     
+    }
+    else{
+    
+      echo "<script>alert('Invalid Details. Please try again.');</script>";
+    }
   }
- 
-}
-?>
+
+  ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -35,7 +39,7 @@ echo "<script>alert('Invalid Details');</script>";
 
 
         <!-- App title -->
-        <title>Centurion News Portal | Admin Panel</title>
+        <title>Centurion News Portal | Forgot Password</title>
 
         <!-- App css -->
         <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -47,7 +51,19 @@ echo "<script>alert('Invalid Details');</script>";
         <link href="assets/css/responsive.css" rel="stylesheet" type="text/css" />
 
         <script src="assets/js/modernizr.min.js"></script>
+<script type="text/javascript">
+function checkpass()
+{
+if(document.changepassword.newpassword.value!=document.changepassword.confirmpassword.value)
+{
+alert('New Password and Confirm Password field does not match');
+document.changepassword.confirmpassword.focus();
+return false;
+}
+return true;
+} 
 
+</script>
     </head>
 
 
@@ -64,7 +80,7 @@ echo "<script>alert('Invalid Details');</script>";
                             <div class="m-t-40 account-pages">
                                 <div class="text-center account-logo-box">
                                     <h2 class="text-uppercase">
-                                        <a href="index.html" class="text-success">
+                                        <a href="index.php" class="text-success">
                                             <span><img src="assets/images/logo.png" alt="" height="56"></span>
                                         </a>
                                     </h2>
@@ -75,22 +91,29 @@ echo "<script>alert('Invalid Details');</script>";
 
                                         <div class="form-group ">
                                             <div class="col-xs-12">
-                                                <input class="form-control" type="text" required="" name="username" placeholder="Username or email" autocomplete="off">
+                                                <input class="form-control" type="text" required="" name="username" placeholder="Username" autocomplete="off">
                                             </div>
                                         </div>
-<a href="forgot-password.php"><i class="mdi mdi-lock"></i> Forgot your password?</a>
-<hr>
+<div class="form-group ">
+                                            <div class="col-xs-12">
+                                                <input class="form-control" type="text" required="" name="email" placeholder="Email" autocomplete="off">
+                                            </div>
+                                        </div>
                                         <div class="form-group">
                                             <div class="col-xs-12">
-                                                <input class="form-control" type="password" name="password" required="" placeholder="Password" autocomplete="off">
+                                               <input type="password" class="form-control" id="userpassword" name="confirmpassword" placeholder="Confirm Password">
                                             </div>
                                         </div>
-
+<div class="form-group">
+                                            <div class="col-xs-12">
+                                               <input type="password" class="form-control" id="userpassword" name="newpassword" placeholder="New Password">
+                                            </div>
+                                        </div>
 
                      
                                         <div class="form-group account-btn text-center m-t-10">
                                             <div class="col-xs-12">
-                                                <button class="btn w-md btn-bordered btn-danger waves-effect waves-light" type="submit" name="login">Log In</button>
+                                                <button class="btn w-md btn-bordered btn-danger waves-effect waves-light" type="submit" name="submit">Reset</button>
                                             </div>
                                         </div>
 
